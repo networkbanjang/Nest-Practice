@@ -3,7 +3,6 @@ import {
   Get,
   HttpException,
   Param,
-  ParseIntPipe,
   UseFilters,
   Post,
   Body,
@@ -15,6 +14,7 @@ import { HttpExceptionFilter } from 'src/http-exception.filter';
 import { Board, BoardStatus } from './board.model';
 import { BoardService } from './board.service';
 import { BoardDto } from './dto/board.dto';
+import { BoardStatusValidationPipe } from './pipes/board.pipe';
 
 @Controller('board')
 export class BoardController {
@@ -32,12 +32,12 @@ export class BoardController {
   }
 
   @Get(':id')
-  async getBoardById(@Param('id') id: string) {
+  getBoardById(@Param('id') id: string) {
     return this.boardService.getBoardById(id);
   }
 
   @Delete(':id')
-  async deleteBoard(@Param('id') id: string) {
+  deleteBoard(@Param('id') id: string) {
     return this.boardService.deleteBoard(id);
   }
 
@@ -49,7 +49,7 @@ export class BoardController {
   @Patch(':id')
   updateBoardStatus(
     @Param('id') id,
-    @Body('status') status: BoardStatus,
+    @Body('status', BoardStatusValidationPipe) status: BoardStatus,
   ): Board {
     return this.boardService.updateBoardStatus(id, status);
   }
