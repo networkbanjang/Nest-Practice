@@ -7,10 +7,14 @@ import {
   UseFilters,
   Post,
   Body,
+  Delete,
+  Patch,
 } from '@nestjs/common';
+
 import { HttpExceptionFilter } from 'src/http-exception.filter';
-import { Board } from './board.model';
+import { Board, BoardStatus } from './board.model';
 import { BoardService } from './board.service';
+import { BoardDto } from './dto/board.dto';
 
 @Controller('board')
 export class BoardController {
@@ -28,17 +32,27 @@ export class BoardController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    console.log(typeof id);
-    return `${id}`;
+  async getBoardById(@Param('id') id: string) {
+    return this.boardService.getBoardById(id);
+  }
+
+  @Delete(':id')
+  async deleteBoard(@Param('id') id: string) {
+    return this.boardService.deleteBoard(id);
   }
 
   @Post()
-  createBoard(
-    @Body('title') title: string,
-    @Body('description') description: string,
-  ):Board {
+  createBoard(@Body() boardDto: BoardDto): Board {
+    return this.boardService.createBoard(boardDto);
+  }
 
-    return this.boardService.createBoard(title,description)
+  @Patch(':id')
+  updateBoardStatus(
+    @Param('id') id,
+    @Body('status') status: BoardStatus,
+  ): Board {
+    return this.boardService.updateBoardStatus(id, status);
   }
 }
+
+//@Param() params 하면 파라미터값 다가져옴
