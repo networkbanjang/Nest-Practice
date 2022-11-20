@@ -8,6 +8,7 @@ import {
   Body,
   Delete,
   Patch,
+  ParseIntPipe
 } from '@nestjs/common';
 
 import { HttpExceptionFilter } from 'src/http-exception.filter';
@@ -21,10 +22,10 @@ import { BoardStatusValidationPipe } from './pipes/board.pipe';
 export class BoardController {
   constructor(private boardService: BoardService) {}
 
-  // @Get('')
-  // getAllBoards(): Board[] {
-  //   return this.boardService.getAllBoards();
-  // }
+  @Get('')
+  getAllBoards(): Promise<BoardORM[]> {
+    return this.boardService.getAllBoards();
+  }
 
   @Get('errorTest')
   @UseFilters(HttpExceptionFilter)
@@ -32,28 +33,30 @@ export class BoardController {
     throw new HttpException('고의적 에러', 401);
   }
 
-  // @Get(':id')
-  // getBoardById(@Param('id') id: string) {
-  //   return this.boardService.getBoardById(id);
-  // }
+  
+  @Get(':id')
+  getBoardById(@Param('id',ParseIntPipe) id: number) : Promise<BoardORM> {
+    return this.boardService.getBoardById(id);
+  }
 
-  // @Delete(':id')
-  // deleteBoard(@Param('id') id: string) {
-  //   return this.boardService.deleteBoard(id);
-  // }
+  @Delete(':id')
+  deleteBoard(@Param('id',ParseIntPipe) id: number)  {
+    return this.boardService.deleteBoard(id);
+  }
 
   @Post()
   createBoard(@Body() boardDto: BoardDto): Promise<BoardORM> {
     return this.boardService.createBoard(boardDto);
   }
 
-  // @Patch(':id')
-  // updateBoardStatus(
-  //   @Param('id') id,
-  //   @Body('status', BoardStatusValidationPipe) status: BoardStatus,
-  // ): BoardDTO {
-  //   return this.boardService.updateBoardStatus(id, status);
-  // }
+  @Patch(':id')
+  updateBoardStatus(
+    @Param('id',ParseIntPipe) id,
+    @Body('status', BoardStatusValidationPipe) status: BoardStatus,
+  ): Promise<BoardORM> {
+    return this.boardService.updateBoardStatus(id, status);
+  }
+
 }
 
 //@Param() params 하면 파라미터값 다가져옴

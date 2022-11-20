@@ -8,36 +8,44 @@ import { BoardDto } from './dto/board.dto';
 @Injectable()
 export class BoardService {
   constructor(
-    @InjectRepository(BoardORM) private boardRepository: Repository<BoardORM>,
+    @InjectRepository(BoardORM)
+    private boardRepository: Repository<BoardORM>,
   ) {}
 
+  async getAllBoards(): Promise<BoardORM[]> {
+    return this.boardRepository.find({order : {createdAt:"DESC"}})
+  }
 
   async createBoard(boardDto: BoardDto): Promise<BoardORM> {
     const { title, description } = boardDto;
     const board = this.boardRepository.create({
       title,
       description,
-      status:BoardStatus.PUBLIC
-    })
+      status: BoardStatus.PUBLIC,
+    });
     await this.boardRepository.save(board);
     return board;
   }
 
-  // getBoardById(id: string): BoardDTO {
-  //   const found = this.boards.find((element) => element.id === id);
-  //   if (!found) {
-  //     throw new NotFoundException('찾을수 없음');
-  //   }
-  //   return found;
-  // }
+  async getBoardById(id: number): Promise<BoardORM> {
+    const found = await this.boardRepository.findOneBy({ id });
+    if (!found) {
+      throw new NotFoundException('찾을수 없음');
+    }
+    return found;
+  }
 
-  // deleteBoard(id: string): void {
-  //   const found = this.getBoardById(id);
-  //   this.boards = this.boards.filter((element) => element.id !== found.id);
-  // }
-  // updateBoardStatus(id: string, status: BoardStatus): BoardDTO {
-  //   const board = this.getBoardById(id);
-  //   board.status = status;
-  //   return board;
-  // }
+  async deleteBoard(id: number): Promise<void> {
+    const result = await this.boardRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Can't Find Board with id ${id}`);
+    }
+  }
+
+  async updateBoardStatus(id: number, status: BoardStatus): Promise<BoardORM> {
+    const board = await this.getBoardById(id);
+    board.status = status;
+    await this.boardRepository.save(board);
+    return board;
+  }
 }
