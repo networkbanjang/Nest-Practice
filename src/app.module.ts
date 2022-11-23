@@ -8,7 +8,7 @@ import { User } from './auth/entity/user.entity';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot(),
     BoardModule,
     AuthModule,
     TypeOrmModule.forRoot({

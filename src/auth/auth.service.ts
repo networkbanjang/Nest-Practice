@@ -44,8 +44,8 @@ export class AuthService {
     if (user && (await bcrypt.compare(password, user.password))) {
       //유저 토큰 생성 (Secret + Payload)
       const payload = { userName }; //payload에는 중요한 정보를 넣지 않는다.
-      const accessToken = await this.jwtService.sign(payload); //알아서 시크릿과 pay로드는 합쳐서 accessToken을 생성해줌
-      return { accessToken };
+      const accessToken = await this.jwtService.sign(payload); //알아서 시크릿과 pay로드를 합쳐서 accessToken을 생성해줌
+      return { accessToken }; 
     } else {
       throw new UnauthorizedException('login failed');
     }

@@ -1,8 +1,10 @@
+import { BoardORM } from 'src/board/entity/board.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
@@ -24,4 +26,7 @@ export class User extends BaseEntity {
   createdAt: Date;
   @UpdateDateColumn() //updaatedAt
   updatedAt: Date;
+
+  @OneToMany((type) => BoardORM, boardORM => boardORM.user, { eager: false })
+  boards: BoardORM[];
 }

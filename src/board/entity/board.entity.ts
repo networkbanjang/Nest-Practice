@@ -1,8 +1,10 @@
+import { User } from 'src/auth/entity/user.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -24,4 +26,7 @@ export class BoardORM extends BaseEntity {
   updatedAt: Date;
   @Column({default:222})  //default value
   default: number
+
+  @ManyToOne(type =>User, user=>user.boards, {eager:false,onDelete: 'CASCADE'})
+  user:User;
 }
