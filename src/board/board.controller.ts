@@ -20,6 +20,7 @@ import { BoardService } from './board.service';
 import { BoardDto } from './dto/board.dto';
 import { BoardStatusValidationPipe } from './pipes/board.pipe';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
+import { getUser } from 'src/auth/customDeco/getUser';
 
 @Controller('board')
 @UseGuards(JwtAuthGuard)
@@ -29,6 +30,11 @@ export class BoardController {
   @Get('')
   getAllBoards(): Promise<BoardORM[]> {
     return this.boardService.getAllBoards();
+  }
+
+  @Get('/search/:userid')
+  searchById(@Param('userid', ParseIntPipe) id: number): Promise<BoardORM[]> {
+    return this.boardService.searchById(id);
   }
 
   @Get('errorTest')
@@ -43,13 +49,13 @@ export class BoardController {
   }
 
   @Delete(':id')
-  deleteBoard(@Param('id', ParseIntPipe) id: number) {
-    return this.boardService.deleteBoard(id);
+  deleteBoard(@Param('id', ParseIntPipe) id: number, @getUser() user) {
+    return this.boardService.deleteBoard(id, user);
   }
 
   @Post()
-  createBoard(@Body() boardDto: BoardDto, @Req() req): Promise<BoardORM> {
-    return this.boardService.createBoard(boardDto, req.user);
+  createBoard(@Body() boardDto: BoardDto, @getUser() user): Promise<BoardORM> {
+    return this.boardService.createBoard(boardDto, user);
   }
 
   @Patch(':id')

@@ -13,9 +13,33 @@ export class BoardService {
     private boardRepository: Repository<BoardORM>,
   ) {}
 
-  async getAllBoards(): Promise<BoardORM[]> {
-   
-    return this.boardRepository.find({ order: { createdAt: 'DESC' },relations:['user'] });
+  getAllBoards(): Promise<BoardORM[]> {
+    return this.boardRepository.find({
+      select: {
+        user: {
+          id: true,
+          userName: true,
+          password: false,
+        },
+      },
+      order: { createdAt: 'DESC' },
+      relations: ['user'],
+    });
+  }
+
+  searchById(userId: number): Promise<BoardORM[]> {
+    return this.boardRepository.find({
+      select: {
+        user: {
+          id: true,
+          userName: true,
+          password: false,
+        },
+      },
+      where: { user: { id: userId } },
+      order: { createdAt: 'DESC' },
+      relations: ['user'],
+    });
   }
 
   async createBoard(boardDto: BoardDto, user: User): Promise<BoardORM> {
@@ -24,7 +48,7 @@ export class BoardService {
       title,
       description,
       status: BoardStatus.PUBLIC,
-      user
+      user,
     });
     await this.boardRepository.save(board);
     return board;
@@ -38,8 +62,12 @@ export class BoardService {
     return found;
   }
 
-  async deleteBoard(id: number): Promise<void> {
-    const result = await this.boardRepository.delete(id);
+  async deleteBoard(id: number, user: User): Promise<void> {
+    const result = await this.boardRepository.delete({
+      id,
+      user: { id: user.id },
+    });
+
     if (result.affected === 0) {
       throw new NotFoundException(`Can't Find Board with id ${id}`);
     }
