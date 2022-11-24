@@ -10,7 +10,8 @@ import {
   Patch,
   ParseIntPipe,
   UseGuards,
-  Req,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 
 import { HttpExceptionFilter } from 'src/http-exception.filter';
@@ -21,6 +22,9 @@ import { BoardDto } from './dto/board.dto';
 import { BoardStatusValidationPipe } from './pipes/board.pipe';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { getUser } from 'src/auth/customDeco/getUser';
+import { ApiOperation } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from 'src/config/multer.option';
 
 @Controller('board')
 @UseGuards(JwtAuthGuard)
@@ -65,6 +69,11 @@ export class BoardController {
   ): Promise<BoardORM> {
     return this.boardService.updateBoardStatus(id, status);
   }
-}
 
-//@Param() params 하면 파라미터값 다가져옴
+  @ApiOperation({ summary: '업로드 테스트' })
+  @UseInterceptors(FileInterceptor('image', multerOptions('images')))
+  @Post('upload')
+  uploadtest(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+    return { image: `http:localhost:3000/media/images/${file.filename}` };  }
+}

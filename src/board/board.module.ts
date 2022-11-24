@@ -5,10 +5,14 @@ import { BoardService } from './board.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BoardORM } from './entity/board.entity';
 import { AuthModule } from 'src/auth/auth.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports:[TypeOrmModule.forFeature([BoardORM]),
-        AuthModule],
+        AuthModule,
+      MulterModule.register({
+        dest:'./upload'    //저장 경로
+      })],
   controllers: [BoardController],
   providers: [BoardService],
 })
